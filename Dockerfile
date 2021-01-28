@@ -21,13 +21,6 @@ FROM web as builder
 # docker will use build cache until it hits something that has changed
 WORKDIR /var/www
 
-# docker-compose only passes build args, not env vars
-# so you have to do a little dance to set the composer env var
-# the COMPOSER var will determine the name of the composer.json and lock files
-ARG COMPOSER
-ENV COMPOSER $COMPOSER
-ARG COMPOSER_INSTALL_FLAGS
-
 # install composer
 ADD https://getcomposer.org/download/2.0.9/composer.phar /usr/bin/composer
 RUN chmod +x /usr/bin/composer
@@ -35,6 +28,13 @@ RUN chmod +x /usr/bin/composer
 # only copy what you need
 # if docker determines there are no changes, we will continue to use cache
 COPY .env composer*.* /var/www/
+
+# docker-compose only passes build args, not env vars
+# so you have to do a little dance to set the composer env var
+# the COMPOSER var will determine the name of the composer.json and lock files
+ARG COMPOSER
+ENV COMPOSER $COMPOSER
+ARG COMPOSER_INSTALL_FLAGS
 
 # run the build command
 RUN composer install $COMPOSER_INSTALL_FLAGS
