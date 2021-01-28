@@ -1,0 +1,40 @@
+version: "3.9"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # using the dev target to keep access to composer
+      target: dev
+      args:
+        # use a php 7.4 iamge
+        IMAGE: "php:7.4-apache"
+        # these are any/all flags to pass to composer install
+        # fyi: the example symfony app requires some dev packages (the app is not configured)
+        COMPOSER_INSTALL_FLAGS: '-o'
+    ports:
+      - 80:80
+    volumes:
+      # mount the current files inside the docker image
+      - .:/var/www
+      # but do not overwrite the vendor files... those are kinda important ;)
+      - /var/www/vendor
+
+
+  # the exact same app running on a different version of php
+  app-php8:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+      args:
+        # just change the image and composer filename
+        IMAGE: "php:8-apache"
+        COMPOSER: composer-php8.json
+        COMPOSER_INSTALL_FLAGS: '-o'
+    ports:
+      - 8080:80
+    volumes:
+      - .:/var/www
+      - /var/www/vendor
+    
